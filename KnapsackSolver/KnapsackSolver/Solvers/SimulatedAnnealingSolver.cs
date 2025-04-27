@@ -64,7 +64,6 @@ namespace KnapsackSolver.Solvers
                                .Select(x => x.i)
                                .ToList();
 
-            Logger.SaveRun($"sa_run.csv");
             return new KnapsackResult(bestVal, bestWeight, selected);
         }
     }

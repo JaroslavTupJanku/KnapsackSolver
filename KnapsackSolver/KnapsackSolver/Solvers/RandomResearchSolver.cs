@@ -34,7 +34,6 @@ namespace KnapsackSolver.Solvers
             var sel = bestMask.Select((inc, i) => (inc, i)).Where(x => x.inc).Select(x => x.i).ToList();
             int bestWeight = sel.Sum(i => items[i].Weight);
 
-            Logger.SaveRun($"rs_run.csv");
             return new KnapsackResult(bestVal, bestWeight, sel);
         }
     }

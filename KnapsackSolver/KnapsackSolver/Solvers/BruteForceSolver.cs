@@ -5,7 +5,6 @@ public static class BruteForceSolver
 {
     public static KnapsackResult SolveBrute(IReadOnlyList<Item> items, int capacity)
     {
-
         int bestValue = 0;
         int bestWeight = 0;
         List<int> bestIndices = [];
@@ -13,7 +12,7 @@ public static class BruteForceSolver
         int n = items.Count;
         int combinations = 1 << n;
 
-        for (int mask = 0; mask < combinations && Experiment.FesCounter < Experiment.MaxFes; mask++)
+        for (int mask = 0; mask < combinations; mask++)
         {
             int totalW = 0, totalV = 0;
             var current = new List<int>();
@@ -21,7 +20,6 @@ public static class BruteForceSolver
             for (int i = 0; i < n; i++)
             {
                 if ((mask & (1 << i)) == 0) continue;
-
                 totalW += items[i].Weight;
                 totalV += items[i].Value;
                 current.Add(i);
@@ -35,7 +33,7 @@ public static class BruteForceSolver
                 Logger.Add(Experiment.FesCounter, bestValue);
             }
 
-            Experiment.FesCounter++; 
+            Experiment.FesCounter++;
         }
 
         return new KnapsackResult(bestValue, bestWeight, bestIndices);

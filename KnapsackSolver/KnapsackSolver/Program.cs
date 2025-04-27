@@ -1,7 +1,6 @@
 ﻿using KnapsackSolver.Models;
 using KnapsackSolver.Services;
 using KnapsackSolver.Solvers;
-using System.Diagnostics;
 
 class Program
 {
@@ -24,9 +23,22 @@ class Program
         for (int i = 0; i < items.Count; i++)
             Console.WriteLine($"  [{i,2}]:  W={items[i].Weight,2},  V={items[i].Value,2}");
 
-        // --- Brute Force 30× -----------
-        var bfRuns = BatchRunner.RunMany(() => BruteForceSolver.SolveBrute(items, capacity), "bf");
-        BatchRunner.PrintStats(bfRuns, "Brute Force");
+        // --- Brute Force -----------
+        Experiment.ResetFes();
+        Experiment.MaxFes = int.MaxValue;       
+        Logger.Clear();
+
+        var bfResult = BruteForceSolver.SolveBrute(items, capacity);
+        Logger.SaveRun("bf.csv");
+
+        Console.WriteLine("\nBrute-force result:");
+        Console.WriteLine($"  Best value : {bfResult.BestValue}");
+        Console.WriteLine($"  Total weight: {bfResult.BestWeight}");
+        Console.WriteLine($"  FES         : {Experiment.FesCounter}\n");
+
+        int fesLimit = Experiment.FesCounter;
+        Experiment.MaxFes = fesLimit;
+        Console.WriteLine($"Limiting heuristics: {fesLimit} FES\n");
 
         // --- Random Search 30× ------------------------------------
         var rsRuns = BatchRunner.RunMany(() => RandomSearchSolver.Solve(items, capacity), "rs");
