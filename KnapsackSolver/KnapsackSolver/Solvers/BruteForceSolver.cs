@@ -1,9 +1,11 @@
 ﻿using KnapsackSolver.Models;
+using KnapsackSolver.Services;
 
 public static class BruteForceSolver
 {
     public static KnapsackResult SolveBrute(IReadOnlyList<Item> items, int capacity)
     {
+
         int bestValue = 0;
         int bestWeight = 0;
         List<int> bestIndices = [];
@@ -30,6 +32,7 @@ public static class BruteForceSolver
                 bestValue = totalV;
                 bestWeight = totalW;
                 bestIndices = [.. current];
+                Logger.Add(Experiment.FesCounter, bestValue);
             }
 
             Experiment.FesCounter++; 

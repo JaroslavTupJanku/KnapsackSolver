@@ -1,6 +1,5 @@
 ﻿using KnapsackSolver.Models;
 using KnapsackSolver.Services;
-using System.Threading.Tasks;
 using static KnapsackSolver.Services.Evaluator;
 
 namespace KnapsackSolver.Solvers
@@ -9,20 +8,22 @@ namespace KnapsackSolver.Solvers
     {
         private static readonly Random r = new();
 
-        public static KnapsackResult Solve( IReadOnlyList<Item> items, int capacity,
-                double initialTemp = 1_000.0, 
+        public static KnapsackResult Solve(IReadOnlyList<Item> items, int capacity,
+                double initialTemp = 1_000.0,
                 double finalTemp = 0.01,
                 double alpha = 0.98,
                 int iterationsPerTemp = 100)
         {
             int n = items.Count;
             bool[] current;
+
             EvalResult currentResult;
+            Logger.Clear();
 
             do
             {
                 current = [.. Enumerable.Range(0, n).Select(_ => r.NextDouble() < 0.5)];
-                currentResult = Evaluator.Evaluate(current, items, capacity); 
+                currentResult = Evaluator.Evaluate(current, items, capacity);
             }
             while (currentResult.Weight > capacity);
 
@@ -44,7 +45,7 @@ namespace KnapsackSolver.Solvers
                     if (delta > 0.0 || r.NextDouble() < Math.Exp(delta / T))
                     {
                         current = neighbor;
-                        currentResult = neighborResult; 
+                        currentResult = neighborResult;
 
                         if (currentResult.Weight <= capacity &&
                             currentResult.Value > bestVal)
@@ -52,6 +53,7 @@ namespace KnapsackSolver.Solvers
                             best = (bool[])current.Clone();
                             bestVal = currentResult.Value;
                             bestWeight = currentResult.Weight;
+                            Logger.Add(Experiment.FesCounter, bestVal);
                         }
                     }
                 }
@@ -62,6 +64,7 @@ namespace KnapsackSolver.Solvers
                                .Select(x => x.i)
                                .ToList();
 
+            Logger.SaveRun($"sa_run.csv");
             return new KnapsackResult(bestVal, bestWeight, selected);
         }
     }

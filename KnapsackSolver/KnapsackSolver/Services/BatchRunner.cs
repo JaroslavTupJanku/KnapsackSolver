@@ -7,7 +7,11 @@ namespace KnapsackSolver.Services
     {
         public record RunInfo(int BestValue, long Ms);
 
-        public static List<RunInfo> RunMany(Func<KnapsackResult> solver, int runs = 30)
+        /// <summary>
+        /// Spustí solver <paramref name="runs"/>-krát, uloží log každého běhu
+        /// do CSV (prefix = <paramref name="label"/>) a vrátí statistiku.
+        /// </summary>
+        public static List<RunInfo> RunMany(Func<KnapsackResult> solver, string label, int runs = 30)
         {
             var list = new List<RunInfo>(runs);
             var sw = new Stopwatch();
@@ -15,9 +19,16 @@ namespace KnapsackSolver.Services
             for (int k = 0; k < runs; k++)
             {
                 Experiment.ResetFes();
+                Logger.Clear();
+
                 sw.Restart();
                 var res = solver();
                 sw.Stop();
+
+                if (k == 0)
+                {
+                    Logger.SaveRun($"{label}.csv");
+                }
 
                 list.Add(new RunInfo(res.BestValue, sw.ElapsedMilliseconds));
             }
@@ -36,12 +47,12 @@ namespace KnapsackSolver.Services
             double meanMs = msArr.Average();
 
             Console.WriteLine($"\n{label}  (n = {data.Count()})");
-            Console.WriteLine($"  VALUE     =>  min: {bestArr.First()};  max: {bestArr.Last()};  " +
-                              $"mean: {meanVal:F2};  median: {bestArr[bestArr.Length / 2]};  " +
-                              $"std: {Std([.. bestArr.Select(x => (double)x)], meanVal):F2};");
-            Console.WriteLine($"  TIME [ms] =>  min: {msArr.First()};  max: {msArr.Last()};  " +
-                              $"mean: {meanMs:F1};  median: {msArr[msArr.Length / 2]};  " +
-                              $"std: {Std([.. msArr.Select(x => (double)x)], meanMs):F1};");
+            Console.WriteLine($"  VALUE  →  min {bestArr.First()},  max {bestArr.Last()},  " +
+                              $"mean {meanVal:F2},  median {bestArr[bestArr.Length / 2]},  " +
+                              $"std {Std(bestArr.Select(x => (double)x).ToArray(), meanVal):F2}");
+            Console.WriteLine($"  TIME ms→  min {msArr.First()},  max {msArr.Last()},  " +
+                              $"mean {meanMs:F1},  median {msArr[msArr.Length / 2]},  " +
+                              $"std {Std(msArr.Select(x => (double)x).ToArray(), meanMs):F1}");
         }
     }
 }
